@@ -5,6 +5,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain.agents import create_tool_calling_agent,AgentExecutor
+import json
 
 
 load_dotenv()
@@ -53,8 +54,7 @@ agent_executor=AgentExecutor(agent=agent,tools=[],verbose=True)
 raw_response=agent_executor.invoke({"query":"What is the meaning of arjun?"})
 print(raw_response)
 
-
-
-
-# response=llm.invoke("what is the meaning of arjun")
-# print(response)
+# raw_response = agent_executor.invoke({"query": "What is the meaning of arjun?"})
+parsed_output = json.loads(raw_response['output'])
+print("Summary:", parsed_output["summary"])
+print("Topic:",parsed_output["topic"])
