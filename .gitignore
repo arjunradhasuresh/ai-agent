@@ -4,3 +4,5 @@ venv/
 
 # Env files
 .env
+
+research_output.txt

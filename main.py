@@ -5,8 +5,8 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain.agents import create_tool_calling_agent,AgentExecutor
-import json
-from tools import search_tool
+# import json
+from tools import search_tool,wiki_tool,save_tool
 
 load_dotenv()
 
@@ -42,7 +42,7 @@ prompt = ChatPromptTemplate.from_messages(
    ]
 ).partial(format_instructions=parser.get_format_instructions())
 
-tools = [search_tool]
+tools = [search_tool,wiki_tool,save_tool]
 agent=create_tool_calling_agent(
     llm=llm,  
     prompt=prompt,
@@ -53,10 +53,12 @@ agent=create_tool_calling_agent(
 agent_executor=AgentExecutor(agent=agent,tools=tools,verbose=True)
 query = input("What can i search for you?")
 raw_response=agent_executor.invoke({"query":query})
-print(raw_response)
+# print(raw_response)
+try:
+    structured_response = parser.parse(raw_response["output"])
+    print(structured_response)
+except Exception as e:
+    print("Error parsing response",e,"Raw response - ",raw_response)
 
-parsed_output = json.loads(raw_response['output'])
-print("Summary:", parsed_output["summary"])
-print("Topic:",parsed_output["topic"])
 
 
