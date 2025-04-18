@@ -6,7 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain.agents import create_tool_calling_agent,AgentExecutor
 import json
-
+from tools import search_tool
 
 load_dotenv()
 
@@ -42,19 +42,21 @@ prompt = ChatPromptTemplate.from_messages(
    ]
 ).partial(format_instructions=parser.get_format_instructions())
 
-
+tools = [search_tool]
 agent=create_tool_calling_agent(
-    llm=llm,
+    llm=llm,  
     prompt=prompt,
-    tools=[]
+    tools=tools
 )
 
 
-agent_executor=AgentExecutor(agent=agent,tools=[],verbose=True)
-raw_response=agent_executor.invoke({"query":"What is the meaning of arjun?"})
+agent_executor=AgentExecutor(agent=agent,tools=tools,verbose=True)
+query = input("What can i search for you?")
+raw_response=agent_executor.invoke({"query":query})
 print(raw_response)
 
-# raw_response = agent_executor.invoke({"query": "What is the meaning of arjun?"})
 parsed_output = json.loads(raw_response['output'])
 print("Summary:", parsed_output["summary"])
 print("Topic:",parsed_output["topic"])
+
+
